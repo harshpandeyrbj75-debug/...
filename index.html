@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For You 🌙</title>
+  <style>
+    body { margin:0; overflow:hidden; font-family:'Segoe UI',sans-serif; color:white; text-align:center; background:black; }
+    canvas { position:fixed; top:0; left:0; z-index:-1; }
+    .container { position:relative; top:26vh; padding:20px; }
+    h1 { font-size:2.4rem; }
+    p { font-size:1.35rem; max-width:760px; margin:20px auto; line-height:1.9; min-height:70px; }
+    button { padding:12px 26px; border:none; border-radius:25px; background:white; color:black; font-size:1rem; cursor:pointer; transition:.25s; margin:5px; }
+    button:hover { transform:scale(1.08); }
+    .progress { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); font-size:.9rem; opacity:.7; }
+    #choices { display:none; margin-top:20px; }
+    #noBtn { position:relative; }
+  </style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+<div class="container">
+  <h1>Hey You 🌙</h1>
+  <p id="story"></p>
+  <button id="btn" onclick="nextLine()">Start ➜</button>
+
+  <div id="choices">
+    <button onclick="yesClicked()">Yes 💘</button>
+    <button id="noBtn" onmouseover="moveNo()">No 🙃</button>
+  </div>
+</div>
+
+<div class="progress" id="progress"></div>
+
+<script>
+const messages = [
+  "Aaj maine chaand ko dekha...",
+  "Aur honestly... woh thoda try hard lag raha tha 😏",
+  "Jaise meri aankhon mein Anushka banna chahta ho...",
+  "Par maine seedha bol diya—",
+  "Itna bhi accha nahi lag rahe ho abhi...",
+  "Kyuki comparison galat ho raha tha...",
+  "Aur tum... usse better ho ❤️",
+  "Bas ek baat yaad rakhna...",
+  "Maine yaha bilkul jhoot nahi bola hai 🙄",
+  "Bas tumne thoda zyada believe kar liya 😉"
+];
+
+let index = 0;
+let typing = false;
+
+function typeEffect(text, i=0){
+  const story=document.getElementById('story');
+  typing=true;
+  if(i<text.length){
+    story.innerHTML+=text.charAt(i);
+    setTimeout(()=>typeEffect(text,i+1),35);
+  } else typing=false;
+}
+
+function nextLine(){
+  // 📳 vibration feedback (mobile)
+  if (navigator.vibrate) {
+    navigator.vibrate(30);
+  }
+  if(typing) return;
+  const story=document.getElementById('story');
+  const btn=document.getElementById('btn');
+  story.innerHTML="";
+
+  if(index<messages.length){
+    typeEffect(messages[index]);
+    index++;
+    document.getElementById('progress').innerText=`${index}/${messages.length}`;
+
+    if(index===messages.length){
+      btn.style.display='none';
+      setTimeout(()=>{
+        document.getElementById('choices').style.display='block';
+        story.innerHTML="Ab bas ek last baat...
+Tum notice karti ho ya nahi, par main karta hoon 😏";
+      },800);
+    }
+  }
+}
+
+function moveNo(){
+  const btn=document.getElementById('noBtn');
+  const x=Math.random()*300-150;
+  const y=Math.random()*200-100;
+  btn.style.transform=`translate(${x}px, ${y}px)`;
+}
+
+function yesClicked(){
+  if (navigator.vibrate) {
+    navigator.vibrate([40, 30, 40]);
+  }
+  const story=document.getElementById('story');
+  document.getElementById('choices').style.display='none';
+  story.innerHTML="I knew it 😌❤️<br><br>Waise... ek baat bataun?<br>Maine yaha bilkul jhoot nahi bola hai 🙄";
+}
+
+// stars
+const canvas=document.getElementById('stars');
+const ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+let stars=[];
+for(let i=0;i<220;i++){
+  stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.4,a:Math.random(),s:Math.random()*0.02});
+}
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(star=>{
+    star.a+=star.s;
+    if(star.a<=0||star.a>=1) star.s*=-1;
+    ctx.beginPath();
+    ctx.arc(star.x,star.y,star.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,255,255,${star.a})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+window.addEventListener('resize',()=>{
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+});
+</script>
+</body>
+</html>
